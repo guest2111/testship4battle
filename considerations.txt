@@ -1,0 +1,94 @@
+
+first attempt was to set up the terminal to accept keyboard commands without being asked over an input(). One could have navigated the field with the arrow keys - see the test.py file.
+
+- time is short now and I plan a to set up a very simple battleship game wihtout much functionality, e.g. hard coded size of field and one set of rules.
+- plan is to give one question to get the move
+    -> e.g. 'b4'
+- for faster gameplay, all bordering fields a discovered after ship is sunk (not diagonal or diagonal as well - undecided)
+- for faster gameplay, one can shoot imedieately again if he has hit an enemy ship
+- yet undecided, whether user will be asked, to deploy ships manually, first only automatic deployment
+
+----------------------------------------------------------------------------------
+
+# G - ship (unhit on own map)       -   big sign as like still swimming
+# c - ship hit                      -   small sign and open as like hit 
+# @ - ship, if last hit             -   dense sign as like smoke of last hit
+# o - hit before / empty            -   empty sign 
+# O - last hit if on water          -   empty sign, big to emphasize lastly targeted 
+
+# x - targeted (only player)        -   invalid due to not working pynput and subprocess 
+
+----------------------------------------------------------------------------------
+
+following classes might be useful:
+
+ - Bmap (battlemap)
+    - x axis counts numbers from left to right
+    - y axis counts letters from up to down
+        - (corresponds to order of printing on terminal)
+    - decorate the field with numbers and letters 
+    - associated Field
+    - display status to opponent
+        -> print()
+    - display status to oneself
+        -> print()
+    - storing ships 
+    - automatic ship deployment
+    - asking: ships left?
+        -> True / False
+    - keeping track of shots so far 
+    - having position of last shot
+        -> (x,y)
+    - giving positions of adjancted field
+    - addon: showing metrics next to map
+    - possible positions
+        -> list()
+    - former attempts
+        -> list()
+    - succesfull hits
+        -> list()
+    - unsuccesful attempts
+        -> list()
+    - apply shot 
+        -> answer hit or empty
+
+ - Field (plain data container)
+    - field data:
+        matrix of [0,1]
+            - 0 - empty
+            - 1 - ship 
+    - history:
+        matrix of [0,1]
+            - 0 - not targeted
+            - 1 - discovered 
+
+ - Turn
+    - having all steps of a turn as methods 
+    - location where rules are applied
+    - steps:
+        - asking position
+        - discover position
+            - if no ship left: end game
+            - if hit, asking position again
+            - if empty, opponent gets his turn 
+
+ - OppAI (opponent AI)
+    - simple: randome position 
+    - choose positions next to hits 
+        - if two adjancted hits then continue the row until sunk
+    - use diagonal pattern
+    - (if manual deployment maybe start at the borders - probably not to implement till deadline)
+
+functions:
+- game running
+    - set up map 
+    - start battle 
+    - at the end print(message)
+- Battle going
+    - turn player
+    - check end 
+    - turn opponent
+    - check end
+
+following global variables are necessary:
+ - rules - dict()
