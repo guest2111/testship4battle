@@ -27,6 +27,20 @@ following classes might be useful:
     - y axis counts letters from up to down
         - (corresponds to order of printing on terminal)
     - decorate the field with numbers and letters 
+        example:
+               a b c d e f g h i j   
+             1 . . . . . . . . . . 1 
+             2 . . . . . . . . . . 2 
+             3 . . . . . . . . . . 3 
+             4 . . . . . . . . . . 4 
+             5 . . . . . . . . . . 5 
+             6 . . . . . . . . . . 6 
+             7 . . . . . . . . . . 7 
+             8 . . . . . . . . . . 8 
+             9 . . . . . . . . . . 9 
+            10 . . . . . . . . . . 10
+               a b c d e f g h i j   
+
     - associated Field
     - display status to opponent
         -> print()
@@ -92,3 +106,4 @@ functions:
 
 following global variables are necessary:
  - rules - dict()
+ -> implement as class for easier access via auto complete
