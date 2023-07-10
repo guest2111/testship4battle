@@ -217,51 +217,106 @@ class BattleMap(Field):
         
         print(s)
 
+    def get_ship_position(self,pos):
+        '''
+        collect all connected ship positions,
+        thus returnin all positions of one ship
+        
+        input: pos - (x,y)
+        '''
+        if self.positions_ships[pos] == 0:
+            return []
+        ans = [pos]
+        # detect direction
+        if self.positions_ships[pos[0]-1,pos[1]] \
+            or self.positions_ships[pos[0]+1,pos[1]]:
+                i = 1
+                while self.positions_ships[pos[0]+i,pos[1]]:
+                    ans.append( (pos[0]+i,pos[1]) )
+                    i += 1
+                i = -1
+                while self.positions_ships[pos[0]+i,pos[1]]:
+                    ans.append( (pos[0]+i,pos[1]) )
+                    i -= 1
+        elif self.positions_ships[pos[0],pos[1]-1] \
+            or self.positions_ships[pos[0],pos[1]+1]:
+                i = 1
+                while self.positions_ships[pos[0],pos[1]+i]:
+                    ans.append( (pos[0],pos[1]+i) )
+                    i += 1
+                i = -1
+                while self.positions_ships[pos[0],pos[1]+i]:
+                    ans.append( (pos[0],pos[1]+i) )
+                    i -= 1
+        return ans
+        
+    def check_ship_sunk(self,pos):
+        '''
+        check whether all given positions are discovered
+        
+        input: pos - [(x1,y1),...]
+        '''
+        for p in pos:
+            if not self.positions_discovered[p]:
+                return False
+        return True        
 
 class set_up_game():
-	'''
-	instance for running game
-	input: Rules instance
-	'''
-	
-	def __init__(self,rules):
-		# map1 is one's own map
-		# map2 is opponents map
-		self.map1 = BattleMap(rules)
-		self.map2 = BattleMap(rules)
-		self._rules = rules
-		self._len_letter = int(np.ceil(rules.nr_cols/26))
-		self.cols = letters[:rules.nr_cols]
-		self.rows = [str(int(i)) for i in range(rules.nr_rows)]
+    '''
+    instance for running game
+    input: Rules instance
+    '''
+    
+    def __init__(self,rules):
+        # map1 is one's own map
+        # map2 is opponents map
+        self.map1 = BattleMap(rules)
+        self.map2 = BattleMap(rules)
+        self._rules = rules
+        self._len_letter = int(np.ceil(rules.nr_cols/26))
+        self.cols = letters[:rules.nr_cols]
+        self.rows = [str(int(i)) for i in range(rules.nr_rows)]
 
-	def ask_position(self):
-		inp = input("Which position do you want to target? : ")
-		if len(inp) < self._len_letter + 1:
-			print("\n"+\
-			"\nPlease enter a position in the format 'xy123'"+\
-			"\nproviding the position of column with the indicated letter"+\
-			"\nand the position of the row with the indicated number.")
-			return self.ask_position()
-		x = letters.find( inp[:self._len_letter] )
-		y = int( inp[self._len_letter:] )
-		if y < 0 or self._rules.nr_cols <= y:
-			print('\n\nPlease give a number in between'+\
-			f' 0 and {self._rules.nr_cols-1} !')
-			return self.ask_position()
-		if x < 0 or self._rules.nr_rows <= x:
-			print('\n\nPlease give a letter for column in between'+\
-			f' a and {letters[self._rules.nr_rows-1]} !')
-			return self.ask_position()
-		return (y,x)
-		
-	def discover_position(self,map):
-		map.positions_discovered[map.last_discovered] = 1
-		
-	def start_game(self):
-		self.map1.print_my_own()
-		while True:
-			self.map2.print_opponent()
-			self.map2.last_discovered = self.ask_position()
-			self.discover_position(self.map2)
+    def ask_position(self):
+        inp = input("Which position do you want to target? : ")
+        if len(inp) < self._len_letter + 1:
+            print("\n"+\
+            "\nPlease enter a position in the format 'xy123'"+\
+            "\nproviding the position of column with the indicated letter"+\
+            "\nand the position of the row with the indicated number.")
+            return self.ask_position()
+        x = letters.find( inp[:self._len_letter] )
+        y = int( inp[self._len_letter:] )
+        if y < 0 or self._rules.nr_cols <= y:
+            print('\n\nPlease give a number in between'+\
+            f' 0 and {self._rules.nr_cols-1} !')
+            return self.ask_position()
+        if x < 0 or self._rules.nr_rows <= x:
+            print('\n\nPlease give a letter for column in between'+\
+            f' a and {letters[self._rules.nr_rows-1]} !')
+            return self.ask_position()
+        return (y,x)
+        
+    def discover_position(self,map):
+        map.positions_discovered[map.last_discovered] = 1
+        # check ship sunk
+        if map.positions_ships[map.last_discovered]:
+            pos_ship = map.get_ship_position(map.last_discovered)
+            if map.check_ship_sunk(pos_ship):
+                self.explode_positions(map,pos_ship)
+
+    def explode_positions(self,map,pos):
+        for p in pos:
+            map.positions_discovered[p[0]-1,p[1]] = 1
+            map.positions_discovered[p[0]+1,p[1]] = 1
+            map.positions_discovered[p[0],p[1]-1] = 1
+            map.positions_discovered[p[0],p[1]+1] = 1
+            
+    def start_game(self):
+        self.map1.print_my_own()
+        while True:
+            self.map2.print_opponent()
+            self.map2.last_discovered = self.ask_position()
+            self.discover_position(self.map2)
 
 
