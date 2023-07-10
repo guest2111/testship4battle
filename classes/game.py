@@ -8,11 +8,11 @@ class Rules():
     '''
 
     def __init__(self):
-        self.nr_cols = 12
-        self.nr_rows = 12
-        self.nr_ships_L2 = 5
-        self.nr_ships_L3 = 4
-        self.nr_ships_L4 = 3
+        self.nr_cols = 7
+        self.nr_rows = 7
+        self.nr_ships_L2 = 4
+        self.nr_ships_L3 = 2
+        self.nr_ships_L4 = 0
 
 
 class Field():
@@ -66,6 +66,9 @@ class BattleMap(Field):
         randomly distributes ships on the map 
         amount defined in the nr_ships_L* attribute of the rules object
         '''
+        # ship can not be deploy in last rows horizontal and
+        # in last columns vertically
+        # maybe improve deploying later !!!
         # collecting demanded ships
         ship_attr = [ a for a in rules.__dir__() if 'nr_ships_L' in a]
         ship_len  = [ int(ship[10:]) for ship in ship_attr]
