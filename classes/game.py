@@ -277,27 +277,32 @@ class set_up_game():
         self.cols = letters[:rules.nr_cols]
         self.rows = [str(int(i)) for i in range(rules.nr_rows)]
 
-    def ask_position(self):
+    def ask_position(self,map):
+        ''' ask user for position to uncover '''
         inp = input("Which position do you want to target? : ")
         if len(inp) < self._len_letter + 1:
             print("\n"+\
             "\nPlease enter a position in the format 'xy123'"+\
             "\nproviding the position of column with the indicated letter"+\
             "\nand the position of the row with the indicated number.")
-            return self.ask_position()
+            return self.ask_position(map)
         x = letters.find( inp[:self._len_letter] )
         y = int( inp[self._len_letter:] )
         if y < 0 or self._rules.nr_cols <= y:
             print('\n\nPlease give a number in between'+\
             f' 0 and {self._rules.nr_cols-1} !')
-            return self.ask_position()
+            return self.ask_position(map)
         if x < 0 or self._rules.nr_rows <= x:
             print('\n\nPlease give a letter for column in between'+\
             f' a and {letters[self._rules.nr_rows-1]} !')
-            return self.ask_position()
+            return self.ask_position(map)
+        if map.positions_discovered(y,x) == 1:
+            print('\n\nYou can not choose a position twice!')
+            return self.ask_position(map)
         return (y,x)
         
     def discover_position(self,map):
+        ''' open last chosen position '''
         map.positions_discovered[map.last_discovered] = 1
         # check ship sunk
         if map.positions_ships[map.last_discovered]:
@@ -306,6 +311,7 @@ class set_up_game():
                 self.explode_positions(map,pos_ship)
 
     def explode_positions(self,map,pos):
+        ''' uncover directly neighboring positions '''
         for p in pos:
             map.positions_discovered[p[0]-1,p[1]] = 1
             map.positions_discovered[p[0]+1,p[1]] = 1
@@ -313,10 +319,11 @@ class set_up_game():
             map.positions_discovered[p[0],p[1]+1] = 1
             
     def start_game(self):
+        ''' starting a while loop until game finished '''
         self.map1.print_my_own()
         while True:
             self.map2.print_opponent()
-            self.map2.last_discovered = self.ask_position()
+            self.map2.last_discovered = self.ask_position(map)
             self.discover_position(self.map2)
 
 
