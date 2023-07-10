@@ -8,8 +8,8 @@ class Rules():
     '''
 
     def __init__(self):
-        self.number_cols = 12
-        self.number_rows = 12
+        self.nr_cols = 12
+        self.nr_rows = 12
         self.nr_ships_L2 = 5
         self.nr_ships_L3 = 4
         self.nr_ships_L4 = 3
@@ -24,9 +24,9 @@ class Field():
     '''
 
     def __init__(self,rules):
-        self.positions_ships      = np.zeros([rules.number_cols, rules.number_rows],'int')
-        self.positions_discovered = np.zeros([rules.number_cols, rules.number_rows],'int')
-        self.field_dummy = rules.number_cols*[' '.join(rules.number_cols*['%s'])]
+        self.positions_ships      = np.zeros([rules.nr_cols, rules.nr_rows],'int')
+        self.positions_discovered = np.zeros([rules.nr_cols, rules.nr_rows],'int')
+        self.field_dummy = rules.nr_cols*[' '.join(rules.nr_cols*['%s'])]
 
 
 class BattleMap(Field):
@@ -36,12 +36,12 @@ class BattleMap(Field):
     
     def __init__(self,rules):
         
-        if rules.number_cols > 26:
-            rules.number_cols = 26
+        if rules.nr_cols > 26:
+            rules.nr_cols = 26
             print('\nAlert, number of columns has been adjusted to 26. \
             Code is not prepared to handle more than one letter as coordinate!')
-        # if rules.number_rows > 26:
-        #     rules.number_rows = 26
+        # if rules.nr_rows > 26:
+        #     rules.nr_rows = 26
         #     print('\nAlert, number of rows has been adjusted to 26. \
         #   Code is not prepared to handle more than one letter as coordinate!')
 
@@ -142,18 +142,18 @@ class BattleMap(Field):
         prepare decorator
         '''
         space_letter = 2
-        space_nr = np.int8(np.floor( np.log10( rules.number_rows )) + 2)
+        space_nr = np.int8(np.floor( np.log10( rules.nr_rows )) + 2)
         spacer_nbr = ''.join(space_nr*[' '])
         line_letters = \
             spacer_nbr \
-            + ''.join((space_letter-1)*[' ']).join(letters[:rules.number_cols]) \
+            + ''.join((space_letter-1)*[' ']).join(letters[:rules.nr_cols]) \
             + spacer_nbr
         
-        placing = ' ' + ' '.join(rules.number_cols*['%s']) + ' '
+        placing = ' ' + ' '.join(rules.nr_cols*['%s']) + ' '
         center = \
             [''.join(\
             [str.rjust(str(i),space_nr-1), placing, str.ljust(str(i),space_nr-1)]\
-            ) for i in range(rules.number_rows)]
+            ) for i in range(rules.nr_rows)]
         # https://dev.to/ra1nbow1/8-ways-to-add-an-element-to-the-beginning-of-a-list-and-string-in-python-925
         s = [line_letters] + center + [line_letters]
         
@@ -161,6 +161,8 @@ class BattleMap(Field):
         
     def print_my_own(self):
         '''
+        print map openly
+        
         as set in the self.visualisation:
         # . - unopened / unopened and no ship - 0 -   small sign, indicating free space
         # G - ship, if no hit                   - 1 -   big sign as like still swimming
@@ -192,3 +194,74 @@ class BattleMap(Field):
         s = self.decorator_lines %(*state_str[:],)
         
         print(s)
+        
+    def print_opponent(self):
+        '''
+        print the map to console as to opponent
+        '''
+        
+        # calculate visualisation
+        field = self.positions_ships + 2*self.positions_discovered
+        if -1 not in self.last_discovered:
+            field[self.last_discovered] += 3
+        # hide not opened positions
+        unopened = self.positions_discovered == 0
+        field[unopened] = 0
+        # transform to list of strings
+        state_str = [ str(i) for i in field.reshape(field.size) ]
+        # replace with desired symbols
+        state_str = [ self.visualisation[s] for s in state_str ]
+        s = self.decorator_lines
+        #print(field)
+        s = self.decorator_lines %(*state_str[:],)
+        
+        print(s)
+
+
+class set_up_game():
+	'''
+	instance for running game
+	input: Rules instance
+	'''
+	
+	def __init__(self,rules):
+		# map1 is one's own map
+		# map2 is opponents map
+		self.map1 = BattleMap(rules)
+		self.map2 = BattleMap(rules)
+		self._rules = rules
+		self._len_letter = int(np.ceil(rules.nr_cols/26))
+		self.cols = letters[:rules.nr_cols]
+		self.rows = [str(int(i)) for i in range(rules.nr_rows)]
+
+	def ask_position(self):
+		inp = input("Which position do you want to target? : ")
+		if len(inp) < self._len_letter + 1:
+			print("\n"+\
+			"\nPlease enter a position in the format 'xy123'"+\
+			"\nproviding the position of column with the indicated letter"+\
+			"\nand the position of the row with the indicated number.")
+			return self.ask_position()
+		x = letters.find( inp[:self._len_letter] )
+		y = int( inp[self._len_letter:] )
+		if y < 0 or self._rules.nr_cols <= y:
+			print('\n\nPlease give a number in between'+\
+			f' 0 and {self._rules.nr_cols-1} !')
+			return self.ask_position()
+		if x < 0 or self._rules.nr_rows <= x:
+			print('\n\nPlease give a letter for column in between'+\
+			f' a and {letters[self._rules.nr_rows-1]} !')
+			return self.ask_position()
+		return (y,x)
+		
+	def discover_position(self,map):
+		map.positions_discovered[map.last_discovered] = 1
+		
+	def start_game(self):
+		self.map1.print_my_own()
+		while True:
+			self.map2.print_opponent()
+			self.map2.last_discovered = self.ask_position()
+			self.discover_position(self.map2)
+
+
