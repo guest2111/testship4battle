@@ -2,11 +2,16 @@ from classes import game
 
 rules = game.Rules()
 
-map1 = game.BattleMap(rules)
-map1.print_my_own()
+print('Welcome!')
+print('\n\nIf you want to procede fast enter "/automatic" instead of position')
+print('\nAttention: Auto mode might be more stupid than computer!')
 
-map2 = game.BattleMap(rules)
-map2.print_opponent()
+name = input("Enter your name : ")
+map1 = game.BattleMap(rules,name)
+# map1.print_my_own()
 
-game_instance = game.Game(rules)
+map2 = game.BattleMap(rules,'computer')
+# map2.print_opponent()
+
+game_instance = game.Game(rules,map1,map2)
 game_instance.start_game()

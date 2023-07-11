@@ -8,10 +8,10 @@ class Rules():
     '''
 
     def __init__(self):
-        self.nr_cols = 7
-        self.nr_rows = 7
-        self.nr_ships_L2 = 4
-        self.nr_ships_L3 = 2
+        self.nr_cols = 4
+        self.nr_rows = 4
+        self.nr_ships_L2 = 2
+        self.nr_ships_L3 = 0
         self.nr_ships_L4 = 0
 
 
@@ -28,13 +28,37 @@ class Field():
         self.pos_discovered = np.zeros([rules.nr_cols, rules.nr_rows],'int')
         self.field_dummy = rules.nr_cols*[' '.join(rules.nr_cols*['%s'])]
 
+# class ShipCollector():
+#     ''' 
+#     class to keep track of all children ships
+#     '''
+#     def __init__(self,map):
+#         self.parent_map = map
+#         self.ships = []
+
+#     def add_ship(self,ship):
+#         ''' adding ship to the collection '''
+#         self.ships.append(ship)
+
+# class Ship():
+#     ''' 
+#     class to keep track of status of ship
+#     '''
+#     instances = []
+    
+#     def __init__(self,parent,pos):
+#         self.parent = parent
+#         self.pos = pos
+#         self.length = len(pos)
+
 
 class BattleMap(Field):
     '''
     class to give a Field the necessary functionality to interact with
     '''
-    
-    def __init__(self,rules):
+    instances = []
+
+    def __init__(self,rules,player):
         
         if rules.nr_cols > 26:
             rules.nr_cols = 26
@@ -59,8 +83,10 @@ class BattleMap(Field):
             '7': 'x'}
         self.last_discovered = (-1,-1)
         self.bool_automatic = False
+        self.player = player
         # deploy ships
         self._deploy_ships_randomly(rules)
+        self.__class__.instances.append(self)
 
     def _deploy_ships_randomly(self,rules):
         '''
@@ -188,7 +214,7 @@ class BattleMap(Field):
         # calculate visualisation
         field = self.pos_ships + 2*self.pos_discovered
         if -1 not in self.last_discovered:
-            field[self.last_discoverd] += 3
+            field[self.last_discovered] += 3
         # transform to list of strings
         state_str = [ str(i) for i in field.reshape(field.size) ]
         # replace with desired symbols
@@ -197,6 +223,7 @@ class BattleMap(Field):
         #print(field)
         s = self.decorator_lines %(*state_str[:],)
         
+        print(f"\n{self.player}'s map:")
         print(s)
         
     def print_opponent(self):
@@ -219,6 +246,7 @@ class BattleMap(Field):
         #print(field)
         s = self.decorator_lines %(*state_str[:],)
         
+        print(f"\n{self.player}'s map:")
         print(s)
 
     def get_ship_position(self,pos):
@@ -268,6 +296,12 @@ class BattleMap(Field):
                 return False
         return True        
 
+    def check_all_ship_sunk(self):
+        ''' check for game over '''
+        inds = self.pos_ships == 1
+        all_disovered = np.all( self.pos_discovered[inds] == 1 )
+        return all_disovered
+
     def guess_randomly(self):
         '''
         make a random guess of position to open
@@ -275,8 +309,7 @@ class BattleMap(Field):
         # https://numpy.org/doc/stable/reference/generated/numpy.argwhere.html
         possible_positions = np.argwhere( self.pos_discovered == 0 )
         possible_positions = [(v[0], v[1]) for v in possible_positions]
-        ind = np.random.randint(0,len(possible_positions)-1)
-        print(possible_positions[ind])
+        ind = np.random.randint(0,len(possible_positions))
         return possible_positions[ind]
 
 class Game():
@@ -285,11 +318,11 @@ class Game():
     input: Rules instance
     '''
     
-    def __init__(self,rules):
+    def __init__(self,rules,map1,map2):
         # map1 is one's own map
         # map2 is opponents map
-        self.map1 = BattleMap(rules)
-        self.map2 = BattleMap(rules)
+        self.map1 = map1
+        self.map2 = map2
         self._rules = rules
         self._len_letter = int(np.ceil(rules.nr_cols/26))
         self.cols = letters[:rules.nr_cols]
@@ -356,11 +389,52 @@ class Game():
                 mapa.pos_discovered[p[0],p[1]-1] = 1
             if p[1] < p1:
                 mapa.pos_discovered[p[0],p[1]+1] = 1
-            
+      
     def start_game(self):
         ''' starting a while loop until game finished '''
-        self.map1.print_my_own()
+
         while True:
-            self.map2.print_opponent()
-            self.map2.last_discovered = self.ask_position(self.map2)
-            self.discover_position(self.map2)
+            ans1 = self.turn_player1()
+            if not ans1: break
+            if ans1:
+                ans2 = self.turn_player2()
+                if not ans2: break
+        print('Game is over! Thanks for playing till the end!')
+
+    def turn_player1(self):
+        ''' 
+        methode for turn of player1
+
+        returns True if opponent has ships left
+        returns False if all of opponent ships sunk
+        '''
+        self.map1.print_my_own()
+        self.map2.print_opponent()
+        self.map2.last_discovered = self.ask_position(self.map2)
+        self.discover_position(self.map2)
+        if self.map2.check_all_ship_sunk():
+            print(f'Player {self.map1.player} has won!')
+            return False
+        if self.map2.pos_ships[self.map2.last_discovered] == 1:
+            # repeat
+            return self.turn_player1()
+        return True
+
+    def turn_player2(self):
+        '''
+        methode for turn of player1
+
+        returns True if opponent has ships left
+        returns False if all of opponent ships sunk
+        '''
+        # self.map2.print_my_own()
+        # self.map1.print_opponent()
+        self.map1.last_discovered = self.map1.guess_randomly()
+        self.discover_position(self.map1)
+        if self.map1.check_all_ship_sunk():
+            print(f'Player {self.map2.player} has won!')
+            return False
+        if self.map1.pos_ships[self.map1.last_discovered] == 1:
+            # repeat
+            return self.turn_player2()
+        return True

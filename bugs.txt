@@ -3,4 +3,10 @@
 
 
 - after refusing to continue automatic the next question was correct but after that again asking to confirm automatic
+	- observed at ffb469c88461833574e18ffb78d4bfbc78f2bcf9
 	--> imediately set boolean to False if declined
+	- corrected with 600c656e7ac06ed3dce5c59f71496e7a5263cbfe
+
+- ships are never position on len(ship)-1 last rows horizontal and on len(ship)-1 last columns vertically
+	-> slight cheat if user observes this behaviour
+	<- no fix yet
