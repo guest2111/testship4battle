@@ -24,8 +24,8 @@ class Field():
     '''
 
     def __init__(self,rules):
-        self.positions_ships      = np.zeros([rules.nr_cols, rules.nr_rows],'int')
-        self.positions_discovered = np.zeros([rules.nr_cols, rules.nr_rows],'int')
+        self.pos_ships      = np.zeros([rules.nr_cols, rules.nr_rows],'int')
+        self.pos_discovered = np.zeros([rules.nr_cols, rules.nr_rows],'int')
         self.field_dummy = rules.nr_cols*[' '.join(rules.nr_cols*['%s'])]
 
 
@@ -52,7 +52,7 @@ class BattleMap(Field):
         self.visualisation = {\
             '0': '.',
             '1': 'G',
-            '2': 'o',
+            '2': ' ',
             '3': 'c',
             '5': 'O',
             '6': '@',
@@ -93,7 +93,7 @@ class BattleMap(Field):
                     print(f'{j} attempts to position single ship')
                     if success:
                         for p in pos:
-                            self.positions_ships[p] = 1
+                            self.pos_ships[p] = 1
             i += 1
         print(f'{i} attempts to position all ships')
         if not success:
@@ -108,7 +108,7 @@ class BattleMap(Field):
         and 
         return success state and position
         '''
-        nr,nc = self.positions_ships.shape
+        nr,nc = self.pos_ships.shape
         # choose start pos:
         x = np.random.randint(0,nc - length + 1)
         y = np.random.randint(0,nr - length + 1)
@@ -125,17 +125,17 @@ class BattleMap(Field):
         '''
         return True if no ship on position and if no neighbours on position
         '''
-        nr,nc = self.positions_ships.shape
+        nr,nc = self.pos_ships.shape
         for pos in positions:
-            if self.positions_ships[pos]:
+            if self.pos_ships[pos]:
                 return False
-            if pos[0] > 0 and self.positions_ships[pos[0]-1,pos[1]]:
+            if pos[0] > 0 and self.pos_ships[pos[0]-1,pos[1]]:
                 return False
-            if pos[0] < nr-1 and self.positions_ships[pos[0]+1,pos[1]]:
+            if pos[0] < nr-1 and self.pos_ships[pos[0]+1,pos[1]]:
                 return False
-            if pos[1] > 0 and self.positions_ships[pos[0],pos[1]-1]:
+            if pos[1] > 0 and self.pos_ships[pos[0],pos[1]-1]:
                 return False
-            if pos[1] < nc-1 and self.positions_ships[pos[0],pos[1]+1]:
+            if pos[1] < nc-1 and self.pos_ships[pos[0],pos[1]+1]:
                 return False
         return True
 
@@ -186,7 +186,7 @@ class BattleMap(Field):
         # 7 - targeted (no calculation)
 
         # calculate visualisation
-        field = self.positions_ships + 2*self.positions_discovered
+        field = self.pos_ships + 2*self.pos_discovered
         if -1 not in self.last_discovered:
             field[self.last_discoverd] += 3
         # transform to list of strings
@@ -205,11 +205,11 @@ class BattleMap(Field):
         '''
         
         # calculate visualisation
-        field = self.positions_ships + 2*self.positions_discovered
+        field = self.pos_ships + 2*self.pos_discovered
         if -1 not in self.last_discovered:
             field[self.last_discovered] += 3
         # hide not opened positions
-        unopened = self.positions_discovered == 0
+        unopened = self.pos_discovered == 0
         field[unopened] = 0
         # transform to list of strings
         state_str = [ str(i) for i in field.reshape(field.size) ]
@@ -228,28 +228,31 @@ class BattleMap(Field):
         
         input: pos - (x,y)
         '''
-        if self.positions_ships[pos] == 0:
+        if self.pos_ships[pos] == 0:
             return []
         ans = [pos]
+        pos0,pos1 = self.pos_ships.shape
+        pos0 -= 1
+        pos1 -= 1
         # detect direction
-        if self.positions_ships[pos[0]-1,pos[1]] \
-            or self.positions_ships[pos[0]+1,pos[1]]:
+        if pos[0] > 0 and self.pos_ships[pos[0]-1,pos[1]] \
+            or pos[0] < pos0 and self.pos_ships[pos[0]+1,pos[1]]:
                 i = 1
-                while self.positions_ships[pos[0]+i,pos[1]]:
+                while pos[0] + i <= pos0 and self.pos_ships[pos[0]+i,pos[1]]:
                     ans.append( (pos[0]+i,pos[1]) )
                     i += 1
                 i = -1
-                while self.positions_ships[pos[0]+i,pos[1]]:
+                while pos[0]+i >= 0 and self.pos_ships[pos[0]+i,pos[1]]:
                     ans.append( (pos[0]+i,pos[1]) )
                     i -= 1
-        elif self.positions_ships[pos[0],pos[1]-1] \
-            or self.positions_ships[pos[0],pos[1]+1]:
+        elif pos[1] > 1 and self.pos_ships[pos[0],pos[1]-1] \
+            or pos[1] < pos0 and self.pos_ships[pos[0],pos[1]+1]:
                 i = 1
-                while self.positions_ships[pos[0],pos[1]+i]:
+                while pos[1] + i <= pos1 and self.pos_ships[pos[0],pos[1]+i]:
                     ans.append( (pos[0],pos[1]+i) )
                     i += 1
                 i = -1
-                while self.positions_ships[pos[0],pos[1]+i]:
+                while pos[1]+i >= 0 and self.pos_ships[pos[0],pos[1]+i]:
                     ans.append( (pos[0],pos[1]+i) )
                     i -= 1
         return ans
@@ -261,7 +264,7 @@ class BattleMap(Field):
         input: pos - [(x1,y1),...]
         '''
         for p in pos:
-            if not self.positions_discovered[p]:
+            if not self.pos_discovered[p]:
                 return False
         return True        
 
@@ -270,13 +273,13 @@ class BattleMap(Field):
         make a random guess of position to open
         '''
         # https://numpy.org/doc/stable/reference/generated/numpy.argwhere.html
-        possible_positions = np.argwhere( self.positions_discovered == 0 )
+        possible_positions = np.argwhere( self.pos_discovered == 0 )
         possible_positions = [(v[0], v[1]) for v in possible_positions]
         ind = np.random.randint(0,len(possible_positions)-1)
         print(possible_positions[ind])
         return possible_positions[ind]
 
-class set_up_game():
+class Game():
     '''
     instance for running game
     input: Rules instance
@@ -324,27 +327,34 @@ class set_up_game():
             print('\n\nPlease give a letter for column in between'+\
             f' a and {letters[self._rules.nr_rows-1]} !')
             return self.ask_position(mapa)
-        if mapa.positions_discovered[y,x] == 1:
+        if mapa.pos_discovered[y,x] == 1:
             print('\n\nYou can not choose a position twice!')
             return self.ask_position(mapa)
         return (y,x)
         
     def discover_position(self,mapa):
         ''' open last chosen position '''
-        mapa.positions_discovered[mapa.last_discovered] = 1
+        mapa.pos_discovered[mapa.last_discovered] = 1
         # check ship sunk
-        if mapa.positions_ships[mapa.last_discovered]:
+        if mapa.pos_ships[mapa.last_discovered]:
             pos_ship = mapa.get_ship_position(mapa.last_discovered)
             if mapa.check_ship_sunk(pos_ship):
                 self.explode_positions(mapa,pos_ship)
 
     def explode_positions(self,mapa,pos):
-        ''' uncover directly neighboring positions '''  
+        ''' uncover directly neighboring positions '''
+        p0,p1 = mapa.pos_discovered.shape
+        p0 -= 1
+        p1 -= 1
         for p in pos:
-            mapa.positions_discovered[p[0]-1,p[1]] = 1
-            mapa.positions_discovered[p[0]+1,p[1]] = 1
-            mapa.positions_discovered[p[0],p[1]-1] = 1
-            mapa.positions_discovered[p[0],p[1]+1] = 1
+            if p[0] > 0:
+                mapa.pos_discovered[p[0]-1,p[1]] = 1
+            if p[0] < p0:
+                mapa.pos_discovered[p[0]+1,p[1]] = 1
+            if p[1] > 0:
+                mapa.pos_discovered[p[0],p[1]-1] = 1
+            if p[1] < p1:
+                mapa.pos_discovered[p[0],p[1]+1] = 1
             
     def start_game(self):
         ''' starting a while loop until game finished '''
@@ -353,5 +363,3 @@ class set_up_game():
             self.map2.print_opponent()
             self.map2.last_discovered = self.ask_position(self.map2)
             self.discover_position(self.map2)
-
-
