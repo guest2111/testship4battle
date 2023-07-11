@@ -170,7 +170,7 @@ class BattleMap(Field):
         as set in the self.visualisation:
         # . - unopened / unopened and no ship - 0 -   small sign, indicating free space
         # G - ship, if no hit                   - 1 -   big sign as like still swimming
-        # o - hit before / empty    - 2 -   empty sign 
+        #   - hit before / empty    - 2 -   empty sign 
         # O - hit before / empty    - 4 -   empty sign 
         # c - ship hit              - 3 -   small sign and open as like hit 
         # @ - ship hit              - 6 -   ship, if last hit
@@ -179,10 +179,10 @@ class BattleMap(Field):
         # 0 - no ship, not uncovered  |
         # 1 - ship                      | ship *1  
         # 2 - uncoverd empty                    | 
-        # 3 - uncoverd ship                  |        | uncovered *2
+        # 3 - uncoverd ship                     |        | uncovered *2
         # 4 - last but uncovered - impossible
-        # 5 - last hit, empty                 |        |
-        # 6 - last hit, ship                |        |        | last *3
+        # 5 - last hit, empty                   |        |
+        # 6 - last hit, ship                    |        |        | last *3
         # 7 - targeted (no calculation)
 
         # calculate visualisation
@@ -302,6 +302,7 @@ class Game():
             if inp in ['y','Y','Yes','1','']:
                 return mapa.guess_randomly()
             else:
+                mapa.bool_automatic = False
                 inp = input("Which position do you want to target? : ")
         else:
             inp = input("Which position do you want to target? : ")
