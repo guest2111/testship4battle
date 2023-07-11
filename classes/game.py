@@ -58,6 +58,7 @@ class BattleMap(Field):
             '6': '@',
             '7': 'x'}
         self.last_discovered = (-1,-1)
+        self.bool_automatic = False
         # deploy ships
         self._deploy_ships_randomly(rules)
 
@@ -264,6 +265,17 @@ class BattleMap(Field):
                 return False
         return True        
 
+    def guess_randomly(self):
+        '''
+        make a random guess of position to open
+        '''
+        # https://numpy.org/doc/stable/reference/generated/numpy.argwhere.html
+        possible_positions = np.argwhere( self.positions_discovered == 0 )
+        possible_positions = [(v[0], v[1]) for v in possible_positions]
+        ind = np.random.randint(0,len(possible_positions)-1)
+        print(possible_positions[ind])
+        return possible_positions[ind]
+
 class set_up_game():
     '''
     instance for running game
@@ -282,7 +294,20 @@ class set_up_game():
 
     def ask_position(self,mapa):
         ''' ask user for position to uncover '''
-        inp = input("Which position do you want to target? : ")
+        if mapa.bool_automatic == True:
+            inp = input("Continue automatic guess? Hit enter or Yes or 1 or y to confirm!")
+            if inp in ['y','Y','Yes','1','']:
+                return mapa.guess_randomly()
+            else:
+                inp = input("Which position do you want to target? : ")
+        else:
+            inp = input("Which position do you want to target? : ")
+        if len(inp)== 1 and inp[0] == '/':
+            mapa.bool_automatic = True
+            return mapa.guess_randomly()
+        if len(inp) > 0 and inp[0] == '/' and inp in '/automatic':
+            mapa.bool_automatic = True
+            return mapa.guess_randomly()
         if len(inp) < self._len_letter + 1:
             print("\n"+\
             "\nPlease enter a position in the format 'xy123'"+\
