@@ -1,0 +1,2 @@
+- at commit cdfb8ea7867dffeeb35143e311b6c0269fa13269 observed bug:
+	- get_ship_position(self,pos) fails if pos is at border or checked position crosses border
