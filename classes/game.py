@@ -8,7 +8,7 @@ class Rules():
     '''
 
     def __init__(self):
-        self.nr_cols = 6
+        self.nr_cols = 7
         self.nr_rows = 7
         self.nr_ships_L2 = 4
         self.nr_ships_L3 = 2
@@ -147,8 +147,8 @@ class BattleMap(Field):
             y = np.random.randint(0,nr)
             pos = [(x+i,y) for i in range(length)]
         # check collision with neighbouring ships
-        print(self.pos_ships.shape)
-        print(pos)
+        # print(self.pos_ships.shape)
+        # print(pos)
         return self._check_neighbours(pos), pos
 
     def _check_neighbours(self,positions):
