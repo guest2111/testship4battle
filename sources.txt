@@ -1,3 +1,6 @@
 
 shortly used
 		# https://www.statology.org/numpy-array-to-int/
+		
+https://numpy.org/doc/stable/reference/generated/numpy.argwhere.html
+	pos_indices = array.argwhere(cond)

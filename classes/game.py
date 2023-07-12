@@ -399,7 +399,10 @@ class Game():
             if ans1:
                 ans2 = self.turn_player2()
                 if not ans2: break
-        print('Game is over! Thanks for playing till the end!')
+        print('____________________________________________________')
+        self.map1.print_my_own()
+        self.map2.print_my_own()
+        print('\nGame is over! Thanks for playing till the end!\n')
 
     def turn_player1(self):
         ''' 
@@ -413,7 +416,8 @@ class Game():
         self.map2.last_discovered = self.ask_position(self.map2)
         self.discover_position(self.map2)
         if self.map2.check_all_ship_sunk():
-            print(f'Player {self.map1.player} has won!')
+            print('____________________________________________________')
+            print(f'\nPlayer {self.map1.player} has won!')
             return False
         if self.map2.pos_ships[self.map2.last_discovered] == 1:
             # repeat
@@ -432,7 +436,8 @@ class Game():
         self.map1.last_discovered = self.map1.guess_randomly()
         self.discover_position(self.map1)
         if self.map1.check_all_ship_sunk():
-            print(f'Player {self.map2.player} has won!')
+            print('____________________________________________________')
+            print(f'\nPlayer {self.map2.player} has won!')
             return False
         if self.map1.pos_ships[self.map1.last_discovered] == 1:
             # repeat
