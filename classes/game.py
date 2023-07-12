@@ -135,14 +135,16 @@ class BattleMap(Field):
         return success state and position
         '''
         nr,nc = self.pos_ships.shape
-        # choose start pos:
-        x = np.random.randint(0,nc - length + 1)
-        y = np.random.randint(0,nr - length + 1)
         # choose direction south or east and collect all points
         d = np.random.randint(2)
+        # choose start pos:
         if d == 0:
+            x = np.random.randint(0,nc)
+            y = np.random.randint(0,nr - length + 1)
             pos = [(x,y+i) for i in range(length)]
         elif d == 1:
+            x = np.random.randint(0,nc - length + 1)
+            y = np.random.randint(0,nr)
             pos = [(x+i,y) for i in range(length)]
         # check collision with neighbouring ships
         return self._check_neighbours(pos), pos
