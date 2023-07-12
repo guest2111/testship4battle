@@ -329,6 +329,15 @@ class Game():
         self._len_letter = int(np.ceil(rules.nr_cols/26))
         self.cols = letters[:rules.nr_cols]
         self.rows = [str(int(i)) for i in range(rules.nr_rows)]
+        # set computer difficulty
+        if '1' in self.map2.player:
+            self.difficulty = 1
+        elif '2' in self.map2.player:
+            self.difficulty = 2
+        elif '3' in self.map2.player:
+            self.difficulty = 3
+        else:
+            self.difficulty = 1
 
     def ask_position(self,mapa):
         ''' ask user for position to uncover '''
@@ -426,6 +435,53 @@ class Game():
             return self.turn_player1()
         return True
 
+    def computer_choice(self):
+        '''
+        strategies how computer guesses next position
+        '''
+        # easy
+        if self.difficulty == 1:
+            return self.map1.guess_randomly()
+        # medium
+        elif self.difficulty == 2:
+            guess = self._target_unsunk_but_hit_ship(self)
+            if guess: 
+				return guess
+            # otherwise
+            return self.map1.guess_randomly()
+        # advanced
+        elif self.difficulty == 3:
+            guess = self._target_unsunk_but_hit_ship(self)
+            if guess: 
+				return guess
+            # otherwise
+            return self.map1.guess_randomly()
+    def _target_unsunk_but_hit_ship(self):
+		'''
+		find hit ships, which are not sunk yet
+		and guess a position next to them
+		'''
+		# find hit ship which is not sunk
+        # (it is not sunk, if there are unopened field next to hitsnr
+        opos = self.map1.pos_discovered
+        ship = self.map1.pos_ships
+        hits = np.argwhere(2 == ship + opos)
+        pos0,pos1 = ship.shape
+        pos0 -= 1
+        pos1 -= 1
+        for pos in hits:
+            print(pos)
+            p0,p1 = pos
+            if 0  < p0   and opos[p0-1,p1] == 0:
+                return (p0-1,p1)
+            if p0 < pos0 and opos[p0+1,p1] == 0:
+                return (p0+1,p1)
+            if 0  < p1   and opos[p0,p1-1] == 0:
+                return (p0,p1-1)
+            if p1 < pos1 and opos[p0,p1+1] == 0:
+                return (p0,p1+1)     
+        return () 
+
     def turn_player2(self):
         '''
         methode for turn of player1
@@ -435,7 +491,8 @@ class Game():
         '''
         # self.map2.print_my_own()
         # self.map1.print_opponent()
-        self.map1.last_discovered = self.map1.guess_randomly()
+        # self.map1.last_discovered = self.map1.guess_randomly()
+        self.map1.last_discovered = self.computer_choice()
         self.discover_position(self.map1)
         if self.map1.check_all_ship_sunk():
             print('____________________________________________________')
@@ -443,5 +500,7 @@ class Game():
             return False
         if self.map1.pos_ships[self.map1.last_discovered] == 1:
             # repeat
+            self.map1.print_my_own()
+            self.map2.print_opponent()
             return self.turn_player2()
         return True

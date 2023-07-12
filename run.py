@@ -10,7 +10,7 @@ name = input("Enter your name : ")
 map1 = game.BattleMap(rules,name)
 # map1.print_my_own()
 
-map2 = game.BattleMap(rules,'computer')
+map2 = game.BattleMap(rules,'computer2')
 # map2.print_opponent()
 
 game_instance = game.Game(rules,map1,map2)
