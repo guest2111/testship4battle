@@ -8,11 +8,11 @@ class Rules():
     '''
 
     def __init__(self):
-        self.nr_cols = 4
-        self.nr_rows = 4
-        self.nr_ships_L2 = 2
-        self.nr_ships_L3 = 0
-        self.nr_ships_L4 = 0
+        self.nr_cols = 6
+        self.nr_rows = 7
+        self.nr_ships_L2 = 4
+        self.nr_ships_L3 = 2
+        self.nr_ships_L4 = 1
 
 
 class Field():
@@ -147,6 +147,8 @@ class BattleMap(Field):
             y = np.random.randint(0,nr)
             pos = [(x+i,y) for i in range(length)]
         # check collision with neighbouring ships
+        print(self.pos_ships.shape)
+        print(pos)
         return self._check_neighbours(pos), pos
 
     def _check_neighbours(self,positions):
@@ -444,24 +446,63 @@ class Game():
             return self.map1.guess_randomly()
         # medium
         elif self.difficulty == 2:
-            guess = self._target_unsunk_but_hit_ship(self)
+            guess = self._target_unsunk_but_hit_ship()
             if guess: 
-				return guess
+                return guess
             # otherwise
             return self.map1.guess_randomly()
         # advanced
         elif self.difficulty == 3:
-            guess = self._target_unsunk_but_hit_ship(self)
-            if guess: 
-				return guess
+            guess = self._target_unsunk_but_hit_ship()
+            if guess:
+                return guess
+
+            # a good (not best) order for getting a hit fast
+            # simple diagonal approach
+            opos = self.map1.pos_discovered
+            ship = self.map1.pos_ships
+            nr,nc = ship.shape
+            control = np.arange(ship.size).reshape(ship.shape)
+            # # get even indices
+            even = ([y for y in range(nr) for x in range(nc) if (x+y)%2 == 0]\
+                ,[x for y in range(nr) for x in range(nc) if (x+y)%2 == 0])
+            control_even = [control[(even[0][i],even[1][i])] \
+                for i in range(len(even[0]))]
+            # even_indices_linear = [x for x in range(nr*nc,2)]
+
+            # weighting indices
+            # https://numpy.org/doc/stable/reference/generated/numpy.bartlett.html
+            col_weight = np.bartlett(nc)
+            row_weight = np.bartlett(nr)
+            w_mat = np.array(\
+                [[rw*cw for cw in col_weight] for rw in row_weight] )
+            # multiplicated weight
+            w_list = [y*x for y in row_weight for x in col_weight]
+            # w_mat  = np.array(w_list).reshape([nr,nc])
+            # sorted indices of multiplicated weight
+            ind_ord = np.argsort(w_list)[::-1]
+            ord1 = [e for e in ind_ord if e%2]
+            ord2 = [e for e in ind_ord if not e%2]
+            # revert to 2d indication
+            for i in ind_ord:
+                x = i%nc
+                y = int((i-x)/nc)
+                if control[(y,x)] in control_even and \
+                    self.map1.pos_discovered[(y,x)] == 0:
+                    return (y,x)
+            for i in ind_ord:
+                x = i%nc
+                y = int((i-x)/nc)
+                if self.map1.pos_discovered[(y,x)] == 0: return (y,x)
             # otherwise
             return self.map1.guess_randomly()
+
     def _target_unsunk_but_hit_ship(self):
-		'''
-		find hit ships, which are not sunk yet
-		and guess a position next to them
-		'''
-		# find hit ship which is not sunk
+        '''
+        find hit ships, which are not sunk yet
+        and guess a position next to them
+        '''
+        # find hit ship which is not sunk
         # (it is not sunk, if there are unopened field next to hitsnr
         opos = self.map1.pos_discovered
         ship = self.map1.pos_ships
@@ -470,7 +511,6 @@ class Game():
         pos0 -= 1
         pos1 -= 1
         for pos in hits:
-            print(pos)
             p0,p1 = pos
             if 0  < p0   and opos[p0-1,p1] == 0:
                 return (p0-1,p1)
@@ -479,8 +519,8 @@ class Game():
             if 0  < p1   and opos[p0,p1-1] == 0:
                 return (p0,p1-1)
             if p1 < pos1 and opos[p0,p1+1] == 0:
-                return (p0,p1+1)     
-        return () 
+                return (p0,p1+1)
+        return ()
 
     def turn_player2(self):
         '''
