@@ -8,11 +8,12 @@ class Rules():
     '''
 
     def __init__(self):
-        self.nr_cols = 7
-        self.nr_rows = 6
-        self.nr_ships_L2 = 0
-        self.nr_ships_L3 = 0
-        self.nr_ships_L4 = 3
+        self.nr_cols = 21
+        self.nr_rows = 21
+        self.nr_ships_L2 = 9
+        self.nr_ships_L3 = 7
+        self.nr_ships_L4 = 5
+        self.nr_ships_L5 = 3
 
 
 class Field():
@@ -455,10 +456,14 @@ class Game():
             # continue with unsunk but hit ships
             guess = self._target_unsunk_but_hit_ship()
             if guess:
+                print('guessing for hit ship:')
+                print(guess)
                 return guess
             # simple diagonal pattern 
-            self._guess_on_diagonal_pattern()
+            print('diagonal')
+            return self._guess_on_diagonal_pattern()
             # otherwise
+            print('random')
             return self.map1.guess_randomly()
 
     def _guess_on_diagonal_pattern(self):
