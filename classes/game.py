@@ -444,6 +444,7 @@ class Game():
             return self.map1.guess_randomly()
         # medium
         elif self.difficulty == 2:
+			# continue with unsunk but hit ships
             guess = self._target_unsunk_but_hit_ship()
             if guess: 
                 return guess
@@ -451,10 +452,16 @@ class Game():
             return self.map1.guess_randomly()
         # advanced
         elif self.difficulty == 3:
+			# continue with unsunk but hit ships
             guess = self._target_unsunk_but_hit_ship()
             if guess:
                 return guess
+            # simple diagonal pattern 
+			self._guess_on_diagonal_pattern()
+            # otherwise
+            return self.map1.guess_randomly()
 
+	def _guess_on_diagonal_pattern(self):
             # a good (not best) order for getting a hit fast
             # simple diagonal approach
             opos = self.map1.pos_discovered
@@ -492,8 +499,6 @@ class Game():
                 x = i%nc
                 y = int((i-x)/nc)
                 if self.map1.pos_discovered[(y,x)] == 0: return (y,x)
-            # otherwise
-            return self.map1.guess_randomly()
 
     def _target_unsunk_but_hit_ship(self):
         '''
