@@ -10,9 +10,9 @@ class Rules():
     def __init__(self):
         self.nr_cols = 7
         self.nr_rows = 6
-        self.nr_ships_L2 = 4
-        self.nr_ships_L3 = 2
-        self.nr_ships_L4 = 0
+        self.nr_ships_L2 = 0
+        self.nr_ships_L3 = 0
+        self.nr_ships_L4 = 3
 
 
 class Field():
@@ -444,7 +444,7 @@ class Game():
             return self.map1.guess_randomly()
         # medium
         elif self.difficulty == 2:
-			# continue with unsunk but hit ships
+            # continue with unsunk but hit ships
             guess = self._target_unsunk_but_hit_ship()
             if guess: 
                 return guess
@@ -452,16 +452,16 @@ class Game():
             return self.map1.guess_randomly()
         # advanced
         elif self.difficulty == 3:
-			# continue with unsunk but hit ships
+            # continue with unsunk but hit ships
             guess = self._target_unsunk_but_hit_ship()
             if guess:
                 return guess
             # simple diagonal pattern 
-			self._guess_on_diagonal_pattern()
+            self._guess_on_diagonal_pattern()
             # otherwise
             return self.map1.guess_randomly()
 
-	def _guess_on_diagonal_pattern(self):
+    def _guess_on_diagonal_pattern(self):
             # a good (not best) order for getting a hit fast
             # simple diagonal approach
             opos = self.map1.pos_discovered
@@ -514,16 +514,35 @@ class Game():
         pos0 -= 1
         pos1 -= 1
         for pos in hits:
+            direction = self.get_direction_of_hit(self.map1,pos,hits)
             p0,p1 = pos
-            if 0  < p0   and opos[p0-1,p1] == 0:
-                return (p0-1,p1)
-            if p0 < pos0 and opos[p0+1,p1] == 0:
-                return (p0+1,p1)
-            if 0  < p1   and opos[p0,p1-1] == 0:
-                return (p0,p1-1)
-            if p1 < pos1 and opos[p0,p1+1] == 0:
-                return (p0,p1+1)
+            if direction == 0:
+                if 0 < p0 and opos[p0-1,p1] == 0:
+                    return (p0-1,p1)
+                if p0 < pos0 and opos[p0+1,p1] == 0:
+                    return (p0+1,p1)
+            if direction == 1:
+                if 0  < p1   and opos[p0,p1-1] == 0:
+                    return (p0,p1-1)
+                if p1 < pos1 and opos[p0,p1+1] == 0:
+                    return (p0,p1+1)
         return ()
+
+    def get_direction_of_hit(self,mapa,pos,hits):
+        ''' returning direction of hit ship if visible '''
+        # get neighbours
+        i = hits.tolist().index(list(pos))
+        if i > 0:
+            if hits[i-1][0] == pos[0]:
+                return 1
+            if hits[i-1][1] == pos[1]:
+                return 0
+        if i < len(hits) - 1:
+            if hits[i+1][0] == pos[0]: 
+                return 1
+            if hits[i+1][1] == pos[1]:
+                return 0
+        return np.random.randint(2)
 
     def turn_player2(self):
         '''
