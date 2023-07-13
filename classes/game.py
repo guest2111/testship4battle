@@ -9,10 +9,10 @@ class Rules():
 
     def __init__(self):
         self.nr_cols = 7
-        self.nr_rows = 7
+        self.nr_rows = 6
         self.nr_ships_L2 = 4
         self.nr_ships_L3 = 2
-        self.nr_ships_L4 = 1
+        self.nr_ships_L4 = 0
 
 
 class Field():
@@ -24,8 +24,8 @@ class Field():
     '''
 
     def __init__(self,rules):
-        self.pos_ships      = np.zeros([rules.nr_cols, rules.nr_rows],'int')
-        self.pos_discovered = np.zeros([rules.nr_cols, rules.nr_rows],'int')
+        self.pos_ships      = np.zeros([rules.nr_rows, rules.nr_cols],'int')
+        self.pos_discovered = np.zeros([rules.nr_rows, rules.nr_cols],'int')
         self.field_dummy = rules.nr_cols*[' '.join(rules.nr_cols*['%s'])]
 
 # class ShipCollector():
@@ -141,14 +141,12 @@ class BattleMap(Field):
         if d == 0:
             x = np.random.randint(0,nc)
             y = np.random.randint(0,nr - length + 1)
-            pos = [(x,y+i) for i in range(length)]
+            pos = [(y+i,x) for i in range(length)]
         elif d == 1:
             x = np.random.randint(0,nc - length + 1)
             y = np.random.randint(0,nr)
-            pos = [(x+i,y) for i in range(length)]
+            pos = [(y,x+i) for i in range(length)]
         # check collision with neighbouring ships
-        # print(self.pos_ships.shape)
-        # print(pos)
         return self._check_neighbours(pos), pos
 
     def _check_neighbours(self,positions):
