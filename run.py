@@ -59,11 +59,8 @@ else:
     rules = game.Rules()
 
 map1 = game.BattleMap(rules,name)
-map1.print_my_own()
 
 map2 = game.BattleMap(rules,AI)
-# map2.print_opponent()
-map2.print_my_own()
 
 game_instance = game.Game(rules,map1,map2)
 game_instance.start_game()
