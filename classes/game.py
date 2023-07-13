@@ -8,8 +8,8 @@ class Rules():
     '''
 
     def __init__(self):
-        self.nr_cols = 21
-        self.nr_rows = 21
+        self.nr_cols = 7
+        self.nr_rows = 7
         self.nr_ships_L2 = 3
         self.nr_ships_L3 = 2
         self.nr_ships_L4 = 1
@@ -34,16 +34,13 @@ class Rules():
         area = (1+self.nr_cols) * (1+self.nr_rows)
         lens = self.get_ship_lengths()
         min_spaces = [(3*len+3)**1.5 for len in lens]
-        print(lens)
         # for i,sl in enumerate(lens):
         pars = 1
         dividor = 1.8
         for sl in lens:
             pars /= dividor
             min_space = (3*sl+3)**1.0
-            print(f'equation: {pars}*{area} / {min_space}')
             allowed_number = pars*area / min_space
-            print(f'exact number: {allowed_number}')
             possible_amount = round(allowed_number)
             # print(f'the length {sl} gets {possible_amount} ships')
             self.__setattr__(f'nr_ships_L{sl}', possible_amount)
@@ -135,7 +132,7 @@ class BattleMap(Field):
 
         #prepare 
         success = False
-        i_max = 25
+        i_max = 250
         i = 0
 
         while not success and i < i_max:
