@@ -10,11 +10,43 @@ class Rules():
     def __init__(self):
         self.nr_cols = 21
         self.nr_rows = 21
-        self.nr_ships_L2 = 9
-        self.nr_ships_L3 = 7
-        self.nr_ships_L4 = 5
-        self.nr_ships_L5 = 3
+        self.nr_ships_L2 = 3
+        self.nr_ships_L3 = 2
+        self.nr_ships_L4 = 1
+        self.nr_ships_L5 = 0
+        self.nr_ships_L6 = 0
+        self.nr_ships_L7 = 0
+        self.nr_ships_L8 = 0
+        self.nr_ships_L9 = 0
 
+    def get_ship_lengths(self):
+        ''' return list of length of ships given in attributes '''
+        ship_attr = [ a for a in self.__dir__() if 'nr_ships_L' in a]
+        ship_len  = [ int(ship[10:]) for ship in ship_attr]
+        return ship_len
+
+    def adjust_ship_amount_to_map(self):
+        ''' 
+        give opportunity to adjust ship amount according to space
+        calculation is done approximately
+        '''
+        # when ship positioned at border it consumes less area than estimated
+        area = (1+self.nr_cols) * (1+self.nr_rows)
+        lens = self.get_ship_lengths()
+        min_spaces = [(3*len+3)**1.5 for len in lens]
+        print(lens)
+        # for i,sl in enumerate(lens):
+        pars = 1
+        dividor = 1.8
+        for sl in lens:
+            pars /= dividor
+            min_space = (3*sl+3)**1.0
+            print(f'equation: {pars}*{area} / {min_space}')
+            allowed_number = pars*area / min_space
+            print(f'exact number: {allowed_number}')
+            possible_amount = round(allowed_number)
+            # print(f'the length {sl} gets {possible_amount} ships')
+            self.__setattr__(f'nr_ships_L{sl}', possible_amount)
 
 class Field():
     '''
@@ -60,7 +92,7 @@ class BattleMap(Field):
     instances = []
 
     def __init__(self,rules,player):
-        
+        self._rules = rules
         if rules.nr_cols > 26:
             rules.nr_cols = 26
             print('\nAlert, number of columns has been adjusted to 26. \
@@ -98,15 +130,13 @@ class BattleMap(Field):
         # in last columns vertically
         # maybe improve deploying later !!!
         # collecting demanded ships
-        ship_attr = [ a for a in rules.__dir__() if 'nr_ships_L' in a]
-        ship_len  = [ int(ship[10:]) for ship in ship_attr]
+        ship_len = self._rules.get_ship_lengths()
         ship_len.sort(reverse=True)
 
         #prepare 
         success = False
-        i_max = 100
+        i_max = 25
         i = 0
-        print(ship_attr)
 
         while not success and i < i_max:
             for sl in ship_len:
@@ -117,14 +147,13 @@ class BattleMap(Field):
                     while not success and j < i_max:
                         [success,pos] = self._position_ship(length=sl)
                         j += 1
-                    print(f'{j} attempts to position single ship')
+                    # print(f'{j} attempts to position single ship')
                     if success:
                         for p in pos:
                             self.pos_ships[p] = 1
             i += 1
-        print(f'{i} attempts to position all ships')
+        # print(f'{i} attempts to position all ships')
         if not success:
-            print(pos)
             message = '\n\nCould not deploy all ships as intended.' +\
                     '\nPlease try again or decrease number of ships in rules!'
             raise RuntimeError(message)
