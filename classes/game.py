@@ -382,7 +382,16 @@ class Game():
             "\nand the position of the row with the indicated number.")
             return self.ask_position(mapa)
         x = letters.find( inp[:self._len_letter] )
-        y = int( inp[self._len_letter:] )
+        if x == -1:
+            print("No valid letter given as first sign of answer.")
+            print("Please enter a position in the format 'xy123'")
+            return self.ask_position(mapa)
+        try:
+            y = int( inp[self._len_letter:] )
+        except:
+            print(f'No number could be recoqnised after {inp[:self._len_letter]}')
+            print("Please enter a position in the format 'xy123'")
+            return self.ask_position(mapa)
         if x < 0 or self._rules.nr_cols <= x:
             print('\n\nPlease give a number for row in between'+\
             f' 0 and {self._rules.nr_rows-1} !')
