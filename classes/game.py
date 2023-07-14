@@ -366,6 +366,9 @@ class Game():
             inp = input("Continue automatic guess? Hit enter or Yes or 1 or y to confirm!")
             if inp in ['y','Y','Yes','1','']:
                 return mapa.guess_randomly()
+            elif len(inp) > 0 and inp[0] == '/' and inp in '/quit':
+                self.map1.pos_discovered = np.ones(self.map1.pos_discovered.shape,dtype='int')
+                return mapa.guess_randomly()
             else:
                 mapa.bool_automatic = False
                 inp = input("Which position do you want to target? : ")
