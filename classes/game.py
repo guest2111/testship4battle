@@ -330,6 +330,8 @@ class BattleMap(Field):
         # https://numpy.org/doc/stable/reference/generated/numpy.argwhere.html
         possible_positions = np.argwhere( self.pos_discovered == 0 )
         possible_positions = [(v[0], v[1]) for v in possible_positions]
+        if len(possible_positions) == 0:
+            return (0,0)
         ind = np.random.randint(0,len(possible_positions))
         return possible_positions[ind]
 
@@ -371,6 +373,9 @@ class Game():
             inp = input("Which position do you want to target? : ")
         if len(inp)== 1 and inp[0] == '/':
             mapa.bool_automatic = True
+            return mapa.guess_randomly()
+        if len(inp) > 0 and inp[0] == '/' and inp in '/quit':
+            self.map1.pos_discovered = np.ones(self.map1.pos_discovered.shape,dtype='int')
             return mapa.guess_randomly()
         if len(inp) > 0 and inp[0] == '/' and inp in '/automatic':
             mapa.bool_automatic = True
@@ -434,8 +439,9 @@ class Game():
 
         self.map1.print_visualisation()
         self.map2.print_visualisation()
-        print('\nIf you want to procede fast enter "/automatic" instead of position')
-        print('\nAttention: Auto mode might be more stupid than computer!')
+        print('\nIf you want to procede quickly, enter "/automatic" instead of position')
+        print('Attention: Auto mode might be more stupid than computer!')
+        print('By entering "/quit" instead of position, you can quit anytime.') 
         while True:
             ans1 = self.turn_player1()
             if not ans1: break
