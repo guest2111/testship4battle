@@ -58,29 +58,6 @@ class Field():
         self.pos_discovered = np.zeros([rules.nr_rows, rules.nr_cols],'int')
         self.field_dummy = rules.nr_cols*[' '.join(rules.nr_cols*['%s'])]
 
-# class ShipCollector():
-#     ''' 
-#     class to keep track of all children ships
-#     '''
-#     def __init__(self,map):
-#         self.parent_map = map
-#         self.ships = []
-
-#     def add_ship(self,ship):
-#         ''' adding ship to the collection '''
-#         self.ships.append(ship)
-
-# class Ship():
-#     ''' 
-#     class to keep track of status of ship
-#     '''
-#     instances = []
-    
-#     def __init__(self,parent,pos):
-#         self.parent = parent
-#         self.pos = pos
-#         self.length = len(pos)
-
 
 class BattleMap(Field):
     '''
@@ -175,7 +152,7 @@ class BattleMap(Field):
             pos = [(y,x+i) for i in range(length)]
         # check collision with neighbouring ships
         return self._check_neighbours(pos), pos
-
+        
     def _check_neighbours(self,positions):
         '''
         return True if no ship on position and if no neighbours on position
@@ -255,6 +232,21 @@ class BattleMap(Field):
         print(f"\n{self.player}'s map:")
         print(s)
         
+    def print_visualisation(self):
+        ''' print expanation of visualisation symbols '''
+        print(f'\n{self.player}`s map is visualised with following symbols:')
+        print(f"'0': {self.visualisation['0']} - unopened position")
+        print(f"'1': {self.visualisation['1']} - " +\
+            "ship, unhit (not visible to opponent)")
+        print(f"'2': {self.visualisation['2']} - opened position but empty")
+        print(f"'3': {self.visualisation['3']} - hit ship position")
+        print(f"'5': {self.visualisation['5']} - "+\
+            "last targeted if empty position")
+        print(f"'6': {self.visualisation['6']} - "+\
+            "last targeted if ship / last hit")
+        print(f"'7': {self.visualisation['7']} - "+\
+            "actual targeted position (not applicable on web interface)")
+
     def print_opponent(self):
         '''
         print the map to console as to opponent
@@ -431,6 +423,8 @@ class Game():
     def start_game(self):
         ''' starting a while loop until game finished '''
 
+        self.map1.print_visualisation()
+        self.map2.print_visualisation()
         while True:
             ans1 = self.turn_player1()
             if not ans1: break
