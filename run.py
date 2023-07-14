@@ -25,6 +25,7 @@ if name:
             nr1,nr2 = size.split(' ')
         else:
             nr1 = size
+            nr2 = ''
         nr1 = int(nr1)
         if not nr2: nr2 = nr1
         nr2 = int(nr2)

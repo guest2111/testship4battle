@@ -33,13 +33,13 @@ class Rules():
         # when ship positioned at border it consumes less area than estimated
         area = (1+self.nr_cols) * (1+self.nr_rows)
         lens = self.get_ship_lengths()
-        min_spaces = [(3*len+3)**1.5 for len in lens]
+        min_spaces = [(4*len)**1.5 for len in lens]
         # for i,sl in enumerate(lens):
         pars = 1
         dividor = 1.8
         for sl in lens:
             pars /= dividor
-            min_space = (3*sl+3)**1.0
+            min_space = 4 + (3*sl+3)**1.0
             allowed_number = pars*area / min_space
             possible_amount = round(allowed_number)
             # print(f'the length {sl} gets {possible_amount} ships')
