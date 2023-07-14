@@ -391,13 +391,13 @@ class Game():
             return self.ask_position(mapa)
         x = letters.find( inp[:self._len_letter] )
         y = int( inp[self._len_letter:] )
-        if y < 0 or self._rules.nr_cols <= y:
-            print('\n\nPlease give a number in between'+\
-            f' 0 and {self._rules.nr_cols-1} !')
+        if x < 0 or self._rules.nr_cols <= x:
+            print('\n\nPlease give a number for row in between'+\
+            f' 0 and {self._rules.nr_rows-1} !')
             return self.ask_position(mapa)
-        if x < 0 or self._rules.nr_rows <= x:
+        if y < 0 or self._rules.nr_rows <= y:
             print('\n\nPlease give a letter for column in between'+\
-            f' a and {letters[self._rules.nr_rows-1]} !')
+            f' a and {letters[self._rules.nr_cols-1]} !')
             return self.ask_position(mapa)
         if mapa.pos_discovered[y,x] == 1:
             print('\n\nYou can not choose a position twice!')
