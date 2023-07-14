@@ -13,7 +13,9 @@ if name:
     print(f"Hello {name}")
 
     print("On which size of map do you want to play?")
-    size = input('\nPlease enter size as [nr_row,nr_col] : ')
+    print("Minimal size is: [4,5]")
+    print("Maximal size is: 26 26")
+    size = input('\nPlease enter size as [number_row,number_col] : ')
 
     try:
         size = size.replace('[','').replace(']','')
@@ -21,7 +23,10 @@ if name:
             nr1,nr2 = size.split(',')
         elif ' ' in size:
             nr1,nr2 = size.split(' ')
+        else:
+			nr1 = size
         nr1 = int(nr1)
+        if not nr2: nr2 = nr1
         nr2 = int(nr2)
         if nr1 < 4:
             nr1 = 4
@@ -45,14 +50,14 @@ if name:
     rules.adjust_ship_amount_to_map()
 
     # difficulty
-    print('Against who do you want to play?')
-    oponent = input("[1] - Computer1 ; [2] - Computer2 ; [3] - Computer3 : ")
-    if '1' in oponent:
-        AI = 'computer1'
-    elif '2' in oponent:
-        AI = 'computer2'
-    elif '3' in oponent:
-        AI = 'computer3'
+    print('Choose difficulty:')
+    oponent = input("[1] - Easy ; [2] - Advanced ; [3] - Hard : ")
+    if '1' in oponent or 'easy' in oponent.lower():
+        AI = 'Easy AI'
+    elif '2' in oponent or 'advanced' in oponent.lower():
+        AI = 'Advanced AI'
+    elif '3' in oponent or 'hard' in oponent.lower():
+        AI = 'Hard AI'
     else:
         print('\n\tI choose "Computer2" for you.')
 else:

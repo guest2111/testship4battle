@@ -357,11 +357,11 @@ class Game():
         self.cols = letters[:rules.nr_cols]
         self.rows = [str(int(i)) for i in range(rules.nr_rows)]
         # set computer difficulty
-        if '1' in self.map2.player:
+        if 'Easy' in self.map2.player:
             self.difficulty = 1
-        elif '2' in self.map2.player:
+        elif 'Advanced' in self.map2.player:
             self.difficulty = 2
-        elif '3' in self.map2.player:
+        elif 'Hard' in self.map2.player:
             self.difficulty = 3
         else:
             self.difficulty = 1
