@@ -5,8 +5,6 @@ rules = game.Rules()
 AI = 'computer2'
 
 print('Welcome!')
-print('\nIf you want to procede fast enter "/automatic" instead of position')
-print('\nAttention: Auto mode might be more stupid than computer!')
 
 name = input("\nEnter your name (or nothing for fast start) : ")
 if name:

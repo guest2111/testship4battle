@@ -434,6 +434,8 @@ class Game():
 
         self.map1.print_visualisation()
         self.map2.print_visualisation()
+        print('\nIf you want to procede fast enter "/automatic" instead of position')
+        print('\nAttention: Auto mode might be more stupid than computer!')
         while True:
             ans1 = self.turn_player1()
             if not ans1: break
