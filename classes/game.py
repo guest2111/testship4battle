@@ -544,14 +544,10 @@ class Game:
             # continue with unsunk but hit ships
             guess = self._target_unsunk_but_hit_ship()
             if guess:
-                print("guessing for hit ship:")
-                print(guess)
                 return guess
             # simple diagonal pattern
-            print("diagonal")
             return self._guess_on_diagonal_pattern()
             # otherwise
-            print("random")
             return self.map1.guess_randomly()
 
     def _guess_on_diagonal_pattern(self):
@@ -611,7 +607,6 @@ class Game:
         pos1 -= 1
         for pos in hits:
             direction = self.get_direction_of_hit(opos, pos, hits)
-            print(f'chosen direction: {direction}')
             p0, p1 = pos
             if direction == 0:
                 if 0 < p0 and opos[p0 - 1, p1] == 0:
