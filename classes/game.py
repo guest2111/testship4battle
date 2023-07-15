@@ -368,7 +368,7 @@ class Game():
                 return mapa.guess_randomly()
             elif len(inp) > 0 and inp[0] == '/' and inp in '/quit':
                 self.map1.pos_discovered = np.ones(self.map1.pos_discovered.shape,dtype='int')
-                return mapa.guess_randomly()
+                return (-1,-1)
             else:
                 mapa.bool_automatic = False
                 inp = input("Which position do you want to target? : ")
@@ -379,7 +379,7 @@ class Game():
             return mapa.guess_randomly()
         if len(inp) > 0 and inp[0] == '/' and inp in '/quit':
             self.map1.pos_discovered = np.ones(self.map1.pos_discovered.shape,dtype='int')
-            return mapa.guess_randomly()
+            return (-1,-1)
         if len(inp) > 0 and inp[0] == '/' and inp in '/automatic':
             mapa.bool_automatic = True
             return mapa.guess_randomly()
@@ -415,6 +415,7 @@ class Game():
         
     def discover_position(self,mapa):
         ''' open last chosen position '''
+        if mapa.last_discovered == (-1,-1): return
         mapa.pos_discovered[mapa.last_discovered] = 1
         # check ship sunk
         if mapa.pos_ships[mapa.last_discovered]:
