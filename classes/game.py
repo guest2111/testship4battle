@@ -74,12 +74,9 @@ class BattleMap(Field):
             rules.nr_cols = 26
             print(
                 "\nAlert, number of columns has been adjusted to 26. \
-            Code is not prepared to handle more than one letter as coordinate!"
+                Code is not prepared to handle more than one letter \
+                as coordinate!"
             )
-        # if rules.nr_rows > 26:
-        #     rules.nr_rows = 26
-        #     print('\nAlert, number of rows has been adjusted to 26. \
-        #   Code is not prepared to handle more than one letter as coordinate!')
 
         super().__init__(rules)
         self._prepare_decorator(rules)
@@ -188,7 +185,12 @@ class BattleMap(Field):
         space_letter = 2
         space_nr = np.int8(np.floor(np.log10(rules.nr_rows)) + 2)
         spacer_nbr = "".join(space_nr * [" "])
-        line_letters = spacer_nbr + "".join((space_letter - 1) * [" "]).join(letters[: rules.nr_cols]) + spacer_nbr
+        line_letters = \
+            spacer_nbr \
+            + "".join(
+                (space_letter - 1) * [" "]
+            ).join(letters[: rules.nr_cols]) \
+            + spacer_nbr
 
         placing = " " + " ".join(rules.nr_cols * ["%s"]) + " "
         center = [
@@ -201,7 +203,8 @@ class BattleMap(Field):
             )
             for i in range(rules.nr_rows)
         ]
-        # https://dev.to/ra1nbow1/8-ways-to-add-an-element-to-the-beginning-of-a-list-and-string-in-python-925
+        # https://dev.to/ra1nbow1/8-ways-to-add-an-element
+        # -to-the-beginning-of-a-list-and-string-in-python-925
         s = [line_letters] + center + [line_letters]
 
         self.decorator_lines = "\n".join(s)
@@ -211,13 +214,14 @@ class BattleMap(Field):
         print map openly
 
         as set in the self.visualisation:
-        # . - unopened / unopened and no ship - 0 -   small sign, indicating free space
-        # G - ship, if no hit                   - 1 -   big sign as like still swimming
-        #   - hit before / empty    - 2 -   empty sign
-        # O - hit before / empty    - 4 -   empty sign
-        # c - ship hit              - 3 -   small sign and open as like hit
-        # @ - ship hit              - 6 -   ship, if last hit
-        # x - targeted              - 7 -
+        # . - unopened
+        #     OR  unopened and no ship - 0 - small sign, indicating free space
+        # G - ship, if no hit          - 1 -   big sign as like still swimming
+        #   - hit before / empty       - 2 -   empty sign
+        # O - hit before / empty       - 4 -   empty sign
+        # c - ship hit                 - 3 -   small sign and open as like hit
+        # @ - ship hit                 - 6 -   ship, if last hit
+        # x - targeted                 - 7 -
         """
         # 0 - no ship, not uncovered  |
         # 1 - ship                      | ship *1
@@ -247,12 +251,24 @@ class BattleMap(Field):
         """print expanation of visualisation symbols"""
         print(f"\n{self.player}`s map is visualised with following symbols:")
         print(f"'0': {self.visualisation['0']} - unopened position")
-        print(f"'1': {self.visualisation['1']} - " + "ship, unhit (not visible to opponent)")
+        print(
+            f"'1': {self.visualisation['1']} - "
+            + "ship, unhit (not visible to opponent)"
+            )
         print(f"'2': {self.visualisation['2']} - opened position but empty")
         print(f"'3': {self.visualisation['3']} - hit ship position")
-        print(f"'5': {self.visualisation['5']} - " + "last targeted if empty position")
-        print(f"'6': {self.visualisation['6']} - " + "last targeted if ship / last hit")
-        print(f"'7': {self.visualisation['7']} - " + "actual targeted position (not applicable on web interface)")
+        print(
+            f"'5': {self.visualisation['5']} - "
+            + "last targeted if empty position"
+            )
+        print(
+            f"'6': {self.visualisation['6']} - "
+            + "last targeted if ship / last hit"
+            )
+        print(
+            f"'7': {self.visualisation['7']} - "
+            + "actual targeted position (not applicable on web interface)"
+            )
 
     def print_opponent(self):
         """
@@ -291,7 +307,8 @@ class BattleMap(Field):
         pos0 -= 1
         pos1 -= 1
         # detect direction
-        if pos[0] > 0 and self.pos_ships[pos[0] - 1, pos[1]] or pos[0] < pos0 and self.pos_ships[pos[0] + 1, pos[1]]:
+        if pos[0] > 0 and self.pos_ships[pos[0] - 1, pos[1]] \
+                or pos[0] < pos0 and self.pos_ships[pos[0] + 1, pos[1]]:
             i = 1
             while pos[0] + i <= pos0 and self.pos_ships[pos[0] + i, pos[1]]:
                 ans.append((pos[0] + i, pos[1]))
@@ -300,7 +317,8 @@ class BattleMap(Field):
             while pos[0] + i >= 0 and self.pos_ships[pos[0] + i, pos[1]]:
                 ans.append((pos[0] + i, pos[1]))
                 i -= 1
-        elif pos[1] > 1 and self.pos_ships[pos[0], pos[1] - 1] or pos[1] < pos0 and self.pos_ships[pos[0], pos[1] + 1]:
+        elif pos[1] > 1 and self.pos_ships[pos[0], pos[1] - 1] \
+                or pos[1] < pos0 and self.pos_ships[pos[0], pos[1] + 1]:
             i = 1
             while pos[1] + i <= pos1 and self.pos_ships[pos[0], pos[1] + i]:
                 ans.append((pos[0], pos[1] + i))
@@ -369,11 +387,15 @@ class Game:
     def ask_position(self, mapa):
         """ask user for position to uncover"""
         if mapa.bool_automatic:
-            inp = input("Continue automatic guess? Hit enter or Yes or 1 or y to confirm!")
+            inp = input(
+                "Continue automatic guess? "
+                + "Hit enter or Yes or 1 or y to confirm!"
+                )
             if inp in ["y", "Y", "Yes", "1", ""]:
                 return mapa.guess_randomly()
             elif len(inp) > 0 and inp[0] == "/" and inp in "/quit":
-                self.map1.pos_discovered = np.ones(self.map1.pos_discovered.shape, dtype="int")
+                self.map1.pos_discovered = \
+                    np.ones(self.map1.pos_discovered.shape, dtype="int")
                 return (-1, -1)
             else:
                 mapa.bool_automatic = False
@@ -384,7 +406,8 @@ class Game:
             mapa.bool_automatic = True
             return mapa.guess_randomly()
         if len(inp) > 0 and inp[0] == "/" and inp in "/quit":
-            self.map1.pos_discovered = np.ones(self.map1.pos_discovered.shape, dtype="int")
+            self.map1.pos_discovered = \
+                np.ones(self.map1.pos_discovered.shape, dtype="int")
             return (-1, -1)
         if len(inp) > 0 and inp[0] == "/" and inp in "/automatic":
             mapa.bool_automatic = True
@@ -393,7 +416,8 @@ class Game:
             print(
                 "\n"
                 + "\nPlease enter a position in the format 'xy123'"
-                + "\nproviding the position of column with the indicated letter"
+                + "\nproviding the position of column with the indicated "
+                + "letter"
                 + "\nand the position of the row with the indicated number."
             )
             return self.ask_position(mapa)
@@ -403,16 +427,26 @@ class Game:
             print("Please enter a position in the format 'xy123'")
             return self.ask_position(mapa)
         try:
-            y = int(inp[self._len_letter :])
+            y = int(inp[self._len_letter:])
         except ValueError:
-            print("No number could be recoqnised after " + f"{inp[:self._len_letter]}")
+            print(
+                "No number could be recoqnised after "
+                + f"{inp[:self._len_letter]}"
+            )
             print("Please enter a position in the format 'xy123'")
             return self.ask_position(mapa)
         if x < 0 or self._rules.nr_cols <= x:
-            print("\n\nPlease give a number for row in between" + f" 0 and {self._rules.nr_rows-1} !")
+            print(
+                "\n\nPlease give a number for row in between"
+                + f" 0 and {self._rules.nr_rows-1} !"
+                )
             return self.ask_position(mapa)
         if y < 0 or self._rules.nr_rows <= y:
-            print("\n" + "\nPlease give a letter for column in between" + f" a and {letters[self._rules.nr_cols-1]} !")
+            print(
+                "\n"
+                + "\nPlease give a letter for column in between"
+                + f" a and {letters[self._rules.nr_cols-1]} !"
+                )
             return self.ask_position(mapa)
         if mapa.pos_discovered[y, x] == 1:
             print("\n\nYou can not choose a position twice!")
@@ -450,9 +484,13 @@ class Game:
 
         self.map1.print_visualisation()
         self.map2.print_visualisation()
-        print('\nIf you want to procede quickly, enter "/automatic" instead of position')
+        print(
+            '\nIf you want to procede quickly, \
+            enter "/automatic" instead of position'
+            )
         print("Attention: Auto mode might be more stupid than computer!")
-        print('By entering "/quit" instead of position, you can quit anytime.')
+        print(
+            'By entering "/quit" instead of position, you can quit anytime.')
         while True:
             ans1 = self.turn_player1()
             if not ans1:
@@ -528,14 +566,16 @@ class Game:
             [y for y in range(nr) for x in range(nc) if (x + y) % 2 == 0],
             [x for y in range(nr) for x in range(nc) if (x + y) % 2 == 0],
         )
-        control_even = [control[(even[0][i], even[1][i])] for i in range(len(even[0]))]
+        control_even = \
+            [control[(even[0][i], even[1][i])] for i in range(len(even[0]))]
         # even_indices_linear = [x for x in range(nr*nc,2)]
 
         # weighting indices
         # https://numpy.org/doc/stable/reference/generated/numpy.bartlett.html
         col_weight = np.bartlett(nc)
         row_weight = np.bartlett(nr)
-        w_mat = np.array([[rw * cw for cw in col_weight] for rw in row_weight])
+        w_mat = \
+            np.array([[rw * cw for cw in col_weight] for rw in row_weight])
         # multiplicated weight
         w_list = [y * x for y in row_weight for x in col_weight]
         # w_mat  = np.array(w_list).reshape([nr,nc])
@@ -547,7 +587,8 @@ class Game:
         for i in ind_ord:
             x = i % nc
             y = int((i - x) / nc)
-            if control[(y, x)] in control_even and self.map1.pos_discovered[(y, x)] == 0:
+            if control[(y, x)] in control_even \
+                    and self.map1.pos_discovered[(y, x)] == 0:
                 return (y, x)
         for i in ind_ord:
             x = i % nc
