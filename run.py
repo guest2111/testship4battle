@@ -2,7 +2,7 @@ from classes import game
 
 # two default values
 rules = game.Rules()
-AI = 'computer2'
+AI = 'Advanced AI'
 
 print('Welcome!')
 
@@ -58,8 +58,9 @@ if name:
     elif '3' in oponent or 'hard' in oponent.lower():
         AI = 'Hard AI'
     else:
-        print('\n\tI choose "Computer2" for you.')
+        print('\n\tI choose "Advanced" for you.')
 else:
+    name = 'Player'
     rules = game.Rules()
 
 map1 = game.BattleMap(rules,name)
