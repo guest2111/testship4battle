@@ -609,8 +609,10 @@ class Game:
         pos0, pos1 = ship.shape
         pos0 -= 1
         pos1 -= 1
+        print(hits)
         for pos in hits:
-            direction = self.get_direction_of_hit(self.map1, pos, hits)
+            direction = self.get_direction_of_hit(opos, pos, hits)
+            print(f'chosen direction: {direction}')
             p0, p1 = pos
             if direction == 0:
                 if 0 < p0 and opos[p0 - 1, p1] == 0:
@@ -624,20 +626,84 @@ class Game:
                     return (p0, p1 + 1)
         return ()
 
-    def get_direction_of_hit(self, mapa, pos, hits):
+    def get_direction_of_hit(self, pos_discovered, pos, hits):
         """returning direction of hit ship if visible"""
         # get neighbours
         i = hits.tolist().index(list(pos))
-        if i > 0:
-            if hits[i - 1][0] == pos[0]:
+        # transforming inputs
+        hits = [(h[0], h[1]) for h in hits]
+        pos = tuple(pos)
+        print('hits:')
+        print(hits)
+        print('pos:')
+        print(pos)
+        print(type(hits))
+        print(type(pos))
+        print(1)
+        if pos[0] > 0 and (pos[0] - 1, pos[1]) in hits:
+            print((pos[0] - 1, pos[1]))
+            print((pos[0] - 1, pos[1]) in hits)
+            print(type((pos[0] - 1, pos[1])))
+            print(2)
+            return 0
+        if pos[1] > 0 and (pos[0], pos[1]-1) in hits:
+            print((pos[0], pos[1]-1))
+            print((pos[0], pos[1]-1) in hits)
+            print(3)
+            return 1
+        if pos[0] < pos_discovered.shape[0] - 1 and (pos[0]+1, pos[1]) in hits:
+            print((pos[0]+1, pos[1]))
+            print((pos[0]+1, pos[1]) in hits)
+            print(4)
+            return 0
+        if pos[1] < pos_discovered.shape[1] - 1 and (pos[0], pos[1]+1) in hits:
+            print((pos[0], pos[1]+1) )
+            print((pos[0], pos[1]+1) in hits)
+            print(5)
+            return 1
+        # check for only one possible direction
+        if pos[0] == 0:
+            print(6)
+            if pos_discovered[(pos[0]+1, pos[1])]:
+                print()
                 return 1
-            if hits[i - 1][1] == pos[1]:
-                return 0
-        if i < len(hits) - 1:
-            if hits[i + 1][0] == pos[0]:
+        elif pos[0] == pos_discovered.shape[0] - 1:
+            print(7)
+            if pos_discovered[(pos[0]-1, pos[1])]:
+                print(8)
                 return 1
-            if hits[i + 1][1] == pos[1]:
+        else:
+            print(9)
+            if pos_discovered[(pos[0]+1, pos[1])] \
+                    and pos_discovered[(pos[0]-1, pos[1])]:
+                print(10)
+                return 1
+        if pos[1] == 0:
+            print(11)
+            if pos_discovered[(pos[0], pos[1]+1)]:
+                print(12)
                 return 0
+        elif pos[1] == pos_discovered.shape[1] - 1:
+            print(13)
+            if pos_discovered[(pos[0], pos[1]-1)]:
+                print(14)
+                return 0
+        else:
+            print(15)
+            if pos_discovered[(pos[0], pos[1]+1)] \
+                    and pos_discovered[(pos[0], pos[1]-1)]:
+                print(16)
+                return 0
+        # if i > 0:
+        #     if hits[i - 1][0] == pos[0]:
+        #         return 1
+        #     if hits[i - 1][1] == pos[1]:
+        #         return 0
+        # if i < len(hits) - 1:
+        #     if hits[i + 1][0] == pos[0]:
+        #         return 1
+        #     if hits[i + 1][1] == pos[1]:
+        #         return 0
         return np.random.randint(2)
 
     def turn_player2(self):
