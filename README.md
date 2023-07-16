@@ -25,7 +25,9 @@ let me shortly explain to you the creation and structure of this program.
    * [Validator Test](#validator-test)
    * [Systematical Tests](#systematical-tests)
  * [Deployment](#deployment)
- * [Solved Bugs](#solved-bugs)
+ * [Bugs](#bugs)
+   * [Solved Bugs](#solved-bugs)
+   * [Open Bugs](#open-bugs)
  * [Credits](#credits)
    * [Code Ideas](#code-ideas)
  * [Final Words](#final-words)
@@ -128,7 +130,33 @@ If one wants to deploy his project publicly, for example on Heroku. He must open
 
 Additionally he has to set a *Config Var* called *PORT* and give it the value *8000*.
 
+# Bugs
+While writing and testing various bugs have been occured and corrected.
+
 # Solved Bugs
+- The file [requirements.txt](/requirements.txt) was first created with `git list > requirements.txt` but in this case the format of the text file is not as expected. It must be done with `git freeze > requirements.txt`.
+
+- On first implementation the initial position of a ship was for row and column in between *0* and *number_<rows/columns> - length_ship*. This makes it possible that a ship is positioned at the right or lower border of the map.  
+Solution was to first decide for a direction and then reduce the area for initial position accordingly.
+
+- There were some mistakes of mixing *row* and *column* coordinates. Numpy arrays take indices as `[row, column]` which is a bit unintuitive.
+
+- When refactoring the diagonal pattern in its own method the `return` command was missing. So the `computer_choice()` was still going to do a random choice.
+
+- When the map size is changed by the user, the amount of ships is recalculated. That should ensure that there is not too much open space on the map.  
+An approach of fitting as many ships as happens is not much useful, because one has then too many or to few long ships.  
+The calculation of the amount of ships is done approximately. By this fix it is mostly succesful.
+
+- The command `/quit` was meant to work anytime. But since the `random_choice()` was called anyway. This leads to the possibilty of hitting a ship and getting a second choice. The `/quit` command is not revertable but has to wait until an unlucky choice. But if the hit was the last necessary hit, the player won anyway.  
+This behaviour was corrected by allowing to return the special position `(-1, -1)`. Which is just ignored. So basically no choice is done and the `/quit` command is effective.
+
+- The method `_target_unsunk_but_hit_ship()` was done not perfectly. The direction was guessed and if in that direction all positions were opened, no position could be guessed and the hit ship was not targeted anymore.  
+Solution was to check in the `get_direction_of_hit()` method, whether one position is not possible to choose because of already openend positions and return the other position. The ensures to have always a possible and by that useful direction in which the actual position is guessed.
+
+# Open
+It is difficult to use create a simple formula to calculate the amount of ships for a map in way, that not much free space is left. It is possible that on some sizes not all needed ships are deployed and the code breaks with a message. If so, one can rerun the programm and enter again the sizes or enter different sizes.
+
+Lately this was not observed anymore but still it can not be excluded.
 
 # Credits
 I list shortly the sources, how to achive something. Some of them are not used anymore in the latest version.
