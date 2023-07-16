@@ -13,15 +13,12 @@ let me shortly explain to you the creation and structure of this program.
    * [First Idea of Responsive Game Play](#first-idea-of-responsive-game-play)
    * [Game Execution Logic](#game-execution-logic)
    * [Needed Methods](#needed-methods)
+ * [Appearance](#appearance)
  * [Rules](#rules)
  * [Features](#features)
  * [Possible Features in Future](#possible-features-in-future)
- * [Structure of Program](#structure-of-program)
-   * [Classes](#classes)
-   * [Data Structure](#data-structure)
-   * [Methods](#methods)
-   * [Gameflow](#gameflow)
  * [Testing](#testing)
+   * [Device Tests](#device-tests)
    * [Validator Test](#validator-test)
    * [Systematical Tests](#systematical-tests)
  * [Deployment](#deployment)
@@ -91,6 +88,17 @@ While programming the set up has been changed. The Field class has remained and 
 
 The game loop, the AI strategies and the dialogs with the user, while game is running, are kept in the `Game` class. Most part is dedicated to the routines, which give some strategy to the AI as targeting a hit ship which is not sunk yet. But other methads are even more imported since they provide the interaction with the user `ask_position`. The afore mentioned main while loop is implemented in the `start_game` method. It is finished if one of the "turn" methods are giving permission to continue.
 
+# Appearance
+Game start:  
+![game start](/docu/maps_game_start.png)
+
+Appearance of map while battle is going (players map left and opponents maps right):  
+![players map](/docu/players_map.png)
+![opponents map](/docu/opponents_map.png)
+
+Example of big map:  
+![big map](/docu/map_biggest.png)
+
 # Rules
 On this Battleship game it is possible to shoot again on same turn right after a successful hit. Ships have different lengths. When a ship is sunk, all directly adjancted fields are opened since it is not allowed to position ships so close to each other, that they can touch each other. 
 
@@ -106,19 +114,59 @@ On this Battleship game it is possible to shoot again on same turn right after a
 - Listing the sunk, hit and total amount of ships per length next to the map.  
 This would allow to have fast overview of the progress. Especialy on big fields it would help.
 
+- Asking for preferred visualisation signs.
+
 - Positioning the ship manually before start if wanted.
 
 - Add another strategy to the computer oponent, which considers the actual opened positions due to sunk ships in combination with the diagonal pattern. E.g. if in the case all ships of length 2 and 3 are sunk, one could guess `f2` and directly `f6` and skipping the `f4` which would come in a simple diagonal pattern as well. Targeting crossings of unopened positions whould be more beneficial than targeting only lines (in the case all souroundings is already open). This is more likely to find a ship since there are more combinations to position the ship there. Such strategy would be very difficult to implement.
 
-# Structure of Program
-## Classes
-## Data Structure
-## Methods
-## Gameflow
 
 # Testing
+## Device Tests
+The game runs on:  
+
+    - Firefox 115.0.1 (64-bit) as snap on  
+    Linux Kubuntu 5.19.0-46-generic #47~22.04.1-Ubuntu x86_64 GNU/Linux
+
+    - Chromium Version 91.0.4472.164 (Developer Build) stable (64-bit) on  
+    Linux OrangeOS  5.10.110-rockchip-rk3588 #1.1.4 aarch64 GNU/Linux
+
+The game does not rund:
+
+    - Firefox 115.0.2 on  
+    Windows 11 Home, 12th Gen Intel(R) Core(TM) i5-1235U, x64-based processor
+
 ## Validator Test
+Both code files [run.py](/run.py) and [classes/game.py](/classes/game.py) have been tested with the *pep8 CodeInstitute* validator. All issues have been resolved.
+
 ## Systematical Tests
+
+| Test name | Decription | Behaviour | Result |
+| --------- | ---------- | --------- | ------ |
+| Enter name | Entering a name on first question | - "Hello {name}" <br />- Asking for size of map | passed |
+| Enter no name | Entering empty string on first question | - start game with 7x7 map | passed |
+| Enter various sizes | 5, 9, 14, 19, 21, 26, [5,13], [19, 7], [12,25] | - map created and ships deployed <br /> - no error | passed |
+| Enter wrong size | strings as 'd', 'df' | - anser "Your input could not be processed" <br /> - "A size of 7x7 will be set" <br /> - Question about difficulty | passed |
+| Enter wrong size | too small number | - anser "Adjusted row amount to minimal value of 4" <br /> - "Adjusted row amount to minimal value of 5" <br /> - Question about difficulty | passed |
+| Enter wrong size | too small number for row (4)  | - anser "Adjusted row amount to minimal value of 5" <br /> - Question about difficulty | passed |
+| Enter wrong size | too small number | - anser "Adjusted row amount to maximal value of 26" <br /> - "Adjusted row amount to maximal value of 26" <br /> - Question about difficulty | passed |
+| Enter wrong size | too small and too big (`[3,33]`) | - anser "Adjusted row amount to minimal value of 4"  <br /> "Adjusted column amount to maximal value of 26" <br /> - Question about difficulty | passed |
+| Questions difficulty | entering nothing | - answer: "I choose "Advanced" for you.
+" <br /> - visualisation signs for both maps - start of game | passed |
+| Questions difficulty | entering wrong signs or too small or too high | - answer: "I choose "Advanced" for you.
+" <br /> - visualisation signs for both maps - start of game | passed |
+| Easy AI |  | - chooses randomly | passed |
+| Advanced AI | | - chooses randomly and continue with hit ship until sunk | passed |
+| Hard AI | | - if hit then target ship until sunk <br /> - diagonal pattern | passed |
+| auto mode on | `/auto` or `/` or `/automatic` | - position is chosen randomely <br /> - next question about to reconfirm | passed |
+| auto mode off | enter any sign except `/quit` | - next question is possition | passed |
+| quitting | `/quit` instead of position | - Game is finished and lost | passed |
+| quitting | `/quit` instead of confirmation of auto mode | - Game is finished and lost | passed |
+| enter position | correct position | - position discoverd | passed |
+| enter position | wrong position | - reask | passed |
+| on hit | turn continues without opponent doing its turn | - ask again | passed |
+| finish game | both maps are displayed | - all ships visible <br /> - state of ships is visible | passed |
+
 
 # Deployment
 Easiest way is to install python 3, install the modules listed in the [requirements.txt](/requirements.txt) via pip, download the project from Github and run the [run.py](/run.py) file.

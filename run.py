@@ -6,7 +6,7 @@ AI = "Advanced AI"
 
 print("Welcome!")
 
-pname = input("\nEnter your pname (or nothing for fast start) : ")
+pname = input("\nEnter your name (or nothing for fast start) : ")
 if pname:
     print(f"Hello {pname}")
 
@@ -30,16 +30,16 @@ if pname:
         nr2 = int(nr2)
         if nr1 < 4:
             nr1 = 4
-            print("Adjusted minimal row amount to 4")
+            print("Adjusted row amount to minimal value of 4")
         if nr2 < 5:
             nr2 = 5
-            print("Adjusted minimal column amount to 5")
+            print("Adjusted column amount to minimal value of 5")
         if nr1 > 26:
             nr1 = 26
-            print("Adjusted minimal row amount to 26")
+            print("Adjusted row amount to maximal value of 26")
         if nr2 > 26:
             nr2 = 26
-            print("Adjusted minimal column amount to 26")
+            print("Adjusted column amount to maximal value of 26")
         rules.nr_rows = nr1
         rules.nr_cols = nr2
     except ValueError:

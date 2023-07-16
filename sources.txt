@@ -4,3 +4,13 @@ shortly used
 		
 https://numpy.org/doc/stable/reference/generated/numpy.argwhere.html
 	pos_indices = array.argwhere(cond)
+
+# https://docs.python.org/3/library/string.html#string.ascii_lowercase
+
+# https://dev.to/ra1nbow1/8-ways-to-add-an-element-to-the-beginning-of-a-list-and-string-in-python-925
+
+# https://pynput.readthedocs.io/en/latest/keyboard.html
+# - handling keyboard inputs
+
+# https://stackoverflow.com/questions/49578801/preventing-key-presses-from-appearing-on-screen
+# -> using subprocess to change terminals echo
