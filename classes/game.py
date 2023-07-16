@@ -553,19 +553,16 @@ class Game:
     def _guess_on_diagonal_pattern(self):
         # a good (not best) order for getting a hit fast
         # simple diagonal approach
-        opos = self.map1.pos_discovered
         ship = self.map1.pos_ships
         nr, nc = ship.shape
         control = np.arange(ship.size).reshape(ship.shape)
-        # # get even indices
+        # get even indices
         even = (
             [y for y in range(nr) for x in range(nc) if (x + y) % 2 == 0],
             [x for y in range(nr) for x in range(nc) if (x + y) % 2 == 0],
         )
         control_even = \
             [control[(even[0][i], even[1][i])] for i in range(len(even[0]))]
-        # even_indices_linear = [x for x in range(nr*nc,2)]
-
         # weighting indices
         # https://numpy.org/doc/stable/reference/generated/numpy.bartlett.html
         col_weight = np.bartlett(nc)
@@ -574,11 +571,8 @@ class Game:
             np.array([[rw * cw for cw in col_weight] for rw in row_weight])
         # multiplicated weight
         w_list = [y * x for y in row_weight for x in col_weight]
-        # w_mat  = np.array(w_list).reshape([nr,nc])
         # sorted indices of multiplicated weight
         ind_ord = np.argsort(w_list)[::-1]
-        ord1 = [e for e in ind_ord if e % 2]
-        ord2 = [e for e in ind_ord if not e % 2]
         # revert to 2d indication
         for i in ind_ord:
             x = i % nc
